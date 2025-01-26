@@ -2,241 +2,11 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from PIL import Image, ImageTk
 import numpy as np
+import json
 
-# Translations dictionary
-translations = {
-    "title": {
-        "en": "Bitmap Editor",
-        "ru": "Редактор битмап изображений",
-        "eo": "Bitmapa Redaktilo",
-        "ja": "ビットマップエディタ",
-        "uk": "Редактор бітмап зображень"
-    },
-    "editor_tab": {
-        "en": "Editor",
-        "ru": "Редактор",
-        "eo": "Redaktilo",
-        "ja": "エディタ",
-        "uk": "Редактор"
-    },
-    "settings_tab": {
-        "en": "Settings",
-        "ru": "Настройки",
-        "eo": "Agordoj",
-        "ja": "設定",
-        "uk": "Налаштування"
-    },
-    "open_file": {
-        "en": "Open File",
-        "ru": "Выберите файл",
-        "eo": "Malfermi Dosieron",
-        "ja": "ファイルを開く",
-        "uk": "Відкрийте файл"
-    },
-    "selected_file": {
-        "en": "Selected file:",
-        "ru": "Выбранный файл:",
-        "eo": "Elektita dosiero:",
-        "ja": "選択されたファイル:",
-        "uk": "Вибраний файл:"
-    },
-    "select_bin_file": {
-        "en": "Select a file with the .bin or .BIN extension",
-        "ru": "Выберите файл с расширением .bin или .BIN",
-        "eo": "Elektu dosieron kun la .bin aŭ .BIN finiĝo",
-        "ja": ".binまたは.BIN拡張子のファイルを選択してください",
-        "uk": "Виберіть файл з розширенням .bin або .BIN"
-    },
-    "file_processing_error": {
-        "en": "An error occurred while processing the file",
-        "ru": "Произошла ошибка при обработке файла",
-        "eo": "Okazis eraro dum la prilaborado de la dosiero",
-        "ja": "ファイルの処理中にエラーが発生しました",
-        "uk": "Сталася помилка під час обробки файлу"
-    },
-    "no_file_selected": {
-        "en": "No file selected",
-        "ru": "Файл не выбран",
-        "eo": "Neniu dosiero elektita",
-        "ja": "ファイルが選択されていません",
-        "uk": "Файл не вибрано"
-    },
-    "image_reload_error": {
-        "en": "An error occurred while reloading the image",
-        "ru": "Произошла ошибка при перезагрузке изображения",
-        "eo": "Okazis eraro dum la reŝarĝado de la bildo",
-        "ja": "画像の再読み込み中にエラーが発生しました",
-        "uk": "Сталася помилка під час перезавантаження зображення"
-    },
-    "open_file_button": {
-        "en": "Open File",
-        "ru": "Открыть файл",
-        "eo": "Malfermi Dosieron",
-        "ja": "ファイルを開く",
-        "uk": "Відкрити файл"
-    },
-    "width_label": {
-        "en": "Image width (px):",
-        "ru": "Ширина изображения (px):",
-        "eo": "Bildo larĝo (pl):",
-        "ja": "画像の幅 (px):",
-        "uk": "Ширина зображення (px):"
-    },
-    "open_table_button": {
-        "en": "Open Pixel Table",
-        "ru": "Открыть таблицу пикселей",
-        "eo": "Malfermi Pikselan Tabelon",
-        "ja": "ピクセルテーブルを開く",
-        "uk": "Відкрити таблицю пікселів"
-    },
-    "save_image_button": {
-        "en": "Save Image",
-        "ru": "Сохранить изображение",
-        "eo": "Konservi Bildon",
-        "ja": "画像を保存",
-        "uk": "Зберегти зображення"
-    },
-    "save_bin_button": {
-        "en": "Save as BIN File",
-        "ru": "Сохранить в BIN файл",
-        "eo": "Konservi kiel BIN-dosiero",
-        "ja": "BINファイルとして保存",
-        "uk": "Зберегти як BIN файл"
-    },
-    "reload_image_button": {
-        "en": "Reload Image",
-        "ru": "Перезагрузить изображение",
-        "eo": "Reŝargi Bildon",
-        "ja": "画像を再読み込み",
-        "uk": "Перезавантажити зображення"
-    },
-    "redraw_grid_button": {
-        "en": "Redraw Grid",
-        "ru": "Перерисовать сетку",
-        "eo": "Remalfermi Krado",
-        "ja": "グリッドを再描画",
-        "uk": "Перемалювати сітку"
-    },
-    "export_image_button": {
-        "en": "Export Image",
-        "ru": "Экспортировать изображение",
-        "eo": "Eksporti Bildon",
-        "ja": "画像をエクスポート",
-        "uk": "Експортувати зображення"
-    },
-    "import_image_button": {
-        "en": "Import Image",
-        "ru": "Импортировать изображение",
-        "eo": "Importi Bildon",
-        "ja": "画像をインポート",
-        "uk": "Імпортувати зображення"
-    },
-    "language_label": {
-        "en": "Language:",
-        "ru": "Язык:",
-        "eo": "Lingvo:",
-        "ja": "言語:",
-        "uk": "Мова:"
-    },
-    "grid_color_label": {
-        "en": "Grid Color (RGB):",
-        "ru": "Цвет сетки (RGB):",
-        "eo": "Krada Koloro (RGB):",
-        "ja": "グリッドの色 (RGB):",
-        "uk": "Колір сітки (RGB):"
-    },
-    "error": {
-        "en": "Error",
-        "ru": "Ошибка",
-        "eo": "Eraro",
-        "ja": "エラー",
-        "uk": "Помилка"
-    },
-    "success": {
-        "en": "Success",
-        "ru": "Успех",
-        "eo": "Sukceso",
-        "ja": "成功",
-        "uk": "Успіх"
-    },
-    "image_saved": {
-        "en": "Image saved as",
-        "ru": "Изображение сохранено как",
-        "eo": "Bildo konservita kiel",
-        "ja": "画像は以下の名前で保存されました",
-        "uk": "Зображення збережено як"
-    },
-    "data_saved": {
-        "en": "Data saved in",
-        "ru": "Данные сохранены в",
-        "eo": "Datumoj konservitaj en",
-        "ja": "データは以下に保存されました",
-        "uk": "Дані збережені в"
-    },
-    "open_image_first": {
-        "en": "Open an image first",
-        "ru": "Сначала откройте изображение",
-        "eo": "Unue malfermu bildon",
-        "ja": "まず画像を開いてください",
-        "uk": "Спочатку відкрийте зображення"
-    },
-    "pixel_table": {
-        "en": "Pixel Table",
-        "ru": "Таблица пикселей",
-        "eo": "Piksela Tabelo",
-        "ja": "ピクセルテーブル",
-        "uk": "Таблиця пікселів"
-    },
-    "table_settings": {
-        "en": "Table Settings",
-        "ru": "Настройка таблицы",
-        "eo": "Tabele Agordoj",
-        "ja": "テーブル設定",
-        "uk": "Налаштування таблиці"
-    },
-    "enter_columns": {
-        "en": "Enter the number of columns:",
-        "ru": "Введите количество столбцов:",
-        "eo": "Enigu la nombron da kolumnoj:",
-        "ja": "列の数を入力してください:",
-        "uk": "Введіть кількість стовпців:"
-    },
-    "column": {
-        "en": "Column",
-        "ru": "Столбец",
-        "eo": "Kolumno",
-        "ja": "列",
-        "uk": "Стовпець"
-    },
-    "image_exported": {
-        "en": "Image exported as",
-        "ru": "Изображение экспортировано как",
-        "eo": "Bildo eksportita kiel",
-        "ja": "画像は以下の名前でエクスポートされました",
-        "uk": "Зображення експортовано як"
-    },
-    "select_tiff_file": {
-        "en": "Select TIFF File",
-        "ru": "Выберите файл TIFF",
-        "eo": "Elektu TIFF-dosieron",
-        "ja": "TIFFファイルを選択してください",
-        "uk": "Виберіть файл TIFF"
-    },
-    "image_size_mismatch": {
-        "en": "Image size does not match the expected dimensions",
-        "ru": "Размер изображения не соответствует ожидаемым размерам",
-        "eo": "La bilda grando ne kongruas kun la atenditaj dimensioj",
-        "ja": "画像のサイズが期待される寸法と一致しません",
-        "uk": "Розмір зображення не відповідає очікуваним розмірам"
-    },
-    "image_import_error": {
-        "en": "An error occurred while importing the image",
-        "ru": "Произошла ошибка при импорте изображения",
-        "eo": "Okazis eraro dum la importado de la bildo",
-        "ja": "画像のインポート中にエラーが発生しました",
-        "uk": "Сталася помилка під час імпорту зображення"
-    }
-}
+# Load translations from JSON file
+with open('translations.json', 'r', encoding='utf-8') as f:
+    translations = json.load(f)
 
 def interpret_as_bitmap(file_path, width):
     with open(file_path, 'rb') as file:
@@ -317,15 +87,27 @@ def display_image():
 def redraw_grid():
     display_image()
 
-def toggle_pixel(event):
-    global image
-    x = int(canvas.canvasx(event.x) / zoom_level)
-    y = int(canvas.canvasy(event.y) / zoom_level)
-    if 0 <= x < image.width and 0 <= y < image.height:
-        current_color = image.getpixel((x, y))
-        new_color = 255 - current_color  # Инвертирование цвета
-        image.putpixel((x, y), new_color)
-        display_image()
+def start_drawing(event):
+    global drawing, new_color
+    drawing = True
+    if event.num == 1:  # Left mouse button
+        new_color = 255  # White
+    elif event.num == 3:  # Right mouse button
+        new_color = 0  # Black
+    draw(event)
+
+def stop_drawing(event):
+    global drawing
+    drawing = False
+
+def draw(event):
+    global image, new_color
+    if drawing:
+        x = int(canvas.canvasx(event.x) / zoom_level)
+        y = int(canvas.canvasy(event.y) / zoom_level)
+        if 0 <= x < image.width and 0 <= y < image.height:
+            image.putpixel((x, y), new_color)
+            display_image()
 
 def save_image():
     save_path = filedialog.asksaveasfilename(defaultextension=".tiff",
@@ -462,6 +244,8 @@ file_path = ""
 image = None
 tk_image = None
 zoom_level = 1.0
+drawing = False
+new_color = None
 
 # Language selection
 language = tk.StringVar(value="en")
@@ -527,7 +311,12 @@ zoom_scale = tk.Scale(editor_tab, from_=100, to=500, orient=tk.HORIZONTAL, label
 zoom_scale.set(100)
 zoom_scale.pack(side=tk.BOTTOM, fill=tk.X)
 
-canvas.bind("<Button-1>", toggle_pixel)
+canvas.bind("<Button-1>", start_drawing)
+canvas.bind("<B1-Motion>", draw)
+canvas.bind("<ButtonRelease-1>", stop_drawing)
+canvas.bind("<Button-3>", start_drawing)
+canvas.bind("<B3-Motion>", draw)
+canvas.bind("<ButtonRelease-3>", stop_drawing)
 root.bind('<Control-r>', bind_hot_reload)
 
 # Settings Tab
