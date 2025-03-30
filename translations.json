@@ -250,5 +250,54 @@
         "eo": "Enigu la heksan kodon de la signo:",
         "ja": "文字の16進コードを入力してください:",
         "uk": "Введіть hex-код символу:"
-    }
+    },
+    "export_folder_button": {
+        "en": "Export as Folder",
+        "ru": "Экспортировать как папку",
+        "eo": "Eksporti kiel Dosierujo",
+        "ja": "フォルダとしてエクスポート",
+        "uk": "Експортувати як папку"
+    },
+    "import_folder_button": {
+        "en": "Import from Folder",
+        "ru": "Импортировать из папки",
+        "eo": "Importi el Dosierujo",
+        "ja": "フォルダからインポート",
+        "uk": "Імпортувати з папки"
+    },
+    "width_mismatch_error": {
+        "en": "Width mismatch! Expected: {expected}, Actual: {actual}",
+        "ru": "Несоответствие ширины! Ожидалось: {expected}, Фактическая: {actual}",
+        "eo": "Larĝo-neakordo! Atendita: {expected}, Reala: {actual}",
+        "ja": "幅が一致しません！ 期待: {expected}, 実際: {actual}",
+        "uk": "Невідповідність ширини! Очікувано: {expected}, Фактична: {actual}"
+    },
+    "invalid_filename_error": {
+        "en": "Invalid filename format: {filename}",
+        "ru": "Недопустимый формат имени файла: {filename}",
+        "eo": "Nevalida dosiernoma formato: {filename}",
+        "ja": "無効なファイル名形式: {filename}",
+        "uk": "Невірний формат імені файлу: {filename}"
+    },
+    "select_folder": {
+        "en": "Select Folder",
+        "ru": "Выберите папку",
+        "eo": "Elektu Dosierujon",
+        "ja": "フォルダを選択",
+        "uk": "Виберіть папку"
+    },
+	"image_imported": {
+		"en": "Image imported successfully!",
+		"ru": "Изображение успешно импортировано!",
+		"eo": "Bildo importita sukcese!",
+		"ja": "画像のインポートが成功しました！",
+		"uk": "Зображення успішно імпортовано!"
+	},
+	"no_cell_files": {
+		"en": "No cell files found!",
+		"ru": "Файлы клеток не найдены!",
+		"eo": "Neniu ĉeldosieroj trovitaj!",
+		"ja": "セルファイルが見つかりません！",
+		"uk": "Файли клітинок не знайдено!"
+	}
 }
