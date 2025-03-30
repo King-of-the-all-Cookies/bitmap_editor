@@ -220,6 +220,112 @@ def update_zoom_level(value):
 def bind_hot_reload(event):
     reload_image()
 
+def export_to_folder():
+    if not image:
+        messagebox.showerror(translations["error"][language.get()], translations["open_image_first"][language.get()])
+        return
+
+    folder_path = filedialog.askdirectory(title=translations["select_folder"][language.get()])
+    if not folder_path:
+        return
+
+    try:
+        width = int(width_entry.get())
+        cell_size = width
+        img_width, img_height = image.size
+        
+        # Create info file
+        with open(os.path.join(folder_path, 'info.txt'), 'w') as f:
+            f.write(str(width))
+        
+        # Calculate grid dimensions
+        cols = img_width // cell_size
+        rows = img_height // cell_size
+        
+        # Save each cell
+        for row in range(rows):
+            for col in range(cols):
+                left = col * cell_size
+                upper = row * cell_size
+                right = left + cell_size
+                lower = upper + cell_size
+                
+                cell = image.crop((left, upper, right, lower))
+                cell.save(os.path.join(folder_path, f"{row}_{col}.tiff"))
+        
+        messagebox.showinfo(translations["success"][language.get()], translations["image_exported"][language.get()])
+    except Exception as e:
+        messagebox.showerror(translations["error"][language.get()], f"Export error: {str(e)}")
+
+def import_from_folder():
+    global image, zoom_level
+    folder_path = filedialog.askdirectory(title=translations["select_folder"][language.get()])
+    if not folder_path:
+        return
+
+    try:
+        # Read width info
+        with open(os.path.join(folder_path, 'info.txt'), 'r') as f:
+            saved_width = int(f.read().strip())
+        
+        current_width = int(width_entry.get())
+        if saved_width != current_width:
+            messagebox.showerror(
+                translations["error"][language.get()],
+                translations["width_mismatch_error"][language.get()].format(
+                    expected=current_width, actual=saved_width
+                )
+            )
+            return
+
+        # Collect and sort cell files
+        cell_files = []
+        for fname in os.listdir(folder_path):
+            if fname.endswith('.tiff'):
+                try:
+                    parts = fname.split('_')
+                    row = int(parts[0])
+                    col = int(parts[1].split('.')[0])
+                    cell_files.append((row, col, fname))
+                except:
+                    messagebox.showerror(
+                        translations["error"][language.get()],
+                        translations["invalid_filename_error"][language.get()].format(filename=fname))
+                    return
+                
+        if not cell_files:
+            messagebox.showerror(translations["error"][language.get()], translations["no_cell_files"][language.get()])
+            return
+
+        # Sort files by row and column
+        cell_files.sort()
+        max_row = max(r for r, c, _ in cell_files)
+        max_col = max(c for r, c, _ in cell_files)
+        
+        # Create empty image
+        cell_size = current_width
+        full_width = (max_col + 1) * cell_size
+        full_height = (max_row + 1) * cell_size
+        new_image = Image.new('L', (full_width, full_height))
+        
+        # Paste cells
+        for row, col, fname in cell_files:
+            cell_path = os.path.join(folder_path, fname)
+            cell = Image.open(cell_path).convert('L')
+            x = col * cell_size
+            y = row * cell_size
+            new_image.paste(cell, (x, y))
+        
+        image = new_image
+        zoom_level = 1.0
+        display_image()
+        messagebox.showinfo(
+    translations["success"][language.get()], 
+    translations["image_imported"][language.get()]
+)
+    except Exception as e:
+        messagebox.showerror(translations["error"][language.get()], f"Import error: {str(e)}")
+
 def update_language(*args):
     language_code = language.get()
     root.title(translations["title"][language_code])
@@ -238,6 +344,8 @@ def update_language(*args):
     language_label.configure(text=translations["language_label"][language_code])
     grid_color_label.configure(text=translations["grid_color_label"][language_code])
     show_kanji_button.configure(text=translations["show_kanji_button"][language_code])
+    export_folder_button.configure(text=translations["export_folder_button"][language.get()])
+    import_folder_button.configure(text=translations["import_folder_button"][language.get()])
 
 def fromhex(a):
     hex_from_str = {'0':'0000', '1':'0001', '2':'0010', '3':'0011',
@@ -361,7 +469,11 @@ import_button.pack(pady=5)
 
 show_kanji_button = ctk.CTkButton(editor_tab, text=translations["show_kanji_button"]["en"], command=open_kanji_window)
 show_kanji_button.pack(pady=5)
+export_folder_button = ctk.CTkButton(editor_tab, text=translations["export_folder_button"][language.get()], command=export_to_folder)
+export_folder_button.pack(pady=5)
 
+import_folder_button = ctk.CTkButton(editor_tab, text=translations["import_folder_button"][language.get()], command=import_from_folder)
+import_folder_button.pack(pady=5)
 canvas_frame = ctk.CTkFrame(editor_tab)
 canvas_frame.pack(fill=ctk.BOTH, expand=True)
 
